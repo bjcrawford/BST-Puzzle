@@ -1,5 +1,6 @@
 package bc_binarysearchtree;
 
+import bc_listnode.BC_ListNode;
 import java.util.LinkedList;
 
 /**
@@ -176,7 +177,7 @@ public class BC_BSTNode {
     @Override
     public String toString() {
         
-        return "\n" + "Data: " + data + " | Image: " + imageName + " | Depth: " + depth + 
+        return "Data: " + data + " | Image: " + imageName + " | Depth: " + depth + 
                " | Index: " + treeIndex + " | x: " + screenX + " | y: " + screenY;
     }
 }

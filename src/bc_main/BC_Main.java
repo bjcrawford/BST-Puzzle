@@ -1,6 +1,7 @@
 package bc_main;
 
 import bc_binarysearchtree.*;
+import bc_listnode.*;
 import java.awt.Color;
 import java.util.LinkedList;
 import java.util.Random;
@@ -31,10 +32,11 @@ public class BC_Main implements SGMouseListener {
     static BC_BST gameBoardModel;
     
     /* A randomized, ordered list used to create the tree */
-    static LinkedList<Integer> originalList;
+    static LinkedList<Integer> originalIntList;
+    static LinkedList<BC_BSTNode> originalNodeList;
     
     /* A shuffled version of the original list */
-    static LinkedList<BC_BSTNode> shuffledList;
+    static LinkedList<BC_ListNode> shuffledNodeList;
     
     static Random rand;
     static SimpleGUI gui;
@@ -77,30 +79,39 @@ public class BC_Main implements SGMouseListener {
         // This ensures the random tree is never more than
         // 4 levels in height. This is to prevent drawing issues.
         do {
-            createOriginalList(numberOfNodes);
+            createOriginalIntList(numberOfNodes);
             createTree();
         } while(gameBoardModel.getMaxDepth() > 4);
         
+        createOriginalNodeList();
         createShuffledList();
     }
     
-    private void createOriginalList(int length) {
+    private void createOriginalIntList(int length) {
         
         int toInsert;
-        originalList = new LinkedList<Integer>();
+        originalIntList = new LinkedList<Integer>();
         
         for(int i = 0; i < length;) {
             toInsert = rand.nextInt(100) + 1;
-            if(!originalList.contains(new Integer(toInsert))) {
-                originalList.add(toInsert);
+            if(!originalIntList.contains(new Integer(toInsert))) {
+                originalIntList.add(toInsert);
                 i++;
             }
+        }
+    }
+    private void createOriginalNodeList() {
+        
+        originalNodeList = new LinkedList<BC_BSTNode>();
+        
+        for(Integer i : originalIntList) {
+            originalNodeList.add(gameBoardModel.getNode(i));
         }
     }
     
     private void createShuffledList() {
         
-        shuffledList = new LinkedList<BC_BSTNode>();
+        shuffledNodeList = new LinkedList<BC_ListNode>();
         
         boolean[] arr = new boolean[numberOfNodes];
         for(int i = 0; i < numberOfNodes; i ++)
@@ -108,7 +119,7 @@ public class BC_Main implements SGMouseListener {
         while(!isBooleanArrayTrue(arr)) {
             int pos = rand.nextInt(numberOfNodes);
             if(arr[pos] == false) {
-                shuffledList.add(gameBoardModel.getNode(originalList.get(pos)));
+                shuffledNodeList.add(new BC_ListNode(gameBoardModel.getNode(originalIntList.get(pos))));
                 arr[pos] = true;
             }
         }
@@ -129,7 +140,7 @@ public class BC_Main implements SGMouseListener {
         
         gameBoardModel = new BC_BST();
         
-        for(Integer i : originalList) {
+        for(Integer i : originalIntList) {
             gameBoardModel.insertIterative(i);
         }
     }
@@ -194,7 +205,7 @@ public class BC_Main implements SGMouseListener {
         
         BC_BSTNode foundNode = null;
         
-        for(BC_BSTNode bstNode : shuffledList) {
+        for(BC_BSTNode bstNode : originalNodeList) {
             if(screenX >= bstNode.getScreenX() && screenX <= bstNode.getScreenX() + nodeSize &&
                screenY >= bstNode.getScreenY() && screenY <= bstNode.getScreenY() + nodeSize) {
                 foundNode = bstNode;
@@ -213,14 +224,18 @@ public class BC_Main implements SGMouseListener {
     private void debugInfo() {
         
         if(DEBUG) {
+            System.out.println("\n\nTree Inorder Traversal: ");
             gameBoardModel.printNodeTraverse("inorder");
-            System.out.println("\nMax Depth: " + gameBoardModel.getMaxDepth());
-            System.out.println("\n\nOriginal List: ");
-            for(Integer i : originalList) 
+            System.out.println("\n\nOriginal Int List: ");
+            for(Integer i : originalIntList) 
                 System.out.print(i + ", ");
-            System.out.println("\n\nShuffled List: ");
-            for(BC_BSTNode bstNode : shuffledList) {
+            System.out.println("\n\nOriginal Node List: ");
+            for(BC_BSTNode bstNode : originalNodeList) {
                 System.out.println(bstNode.toString());
+            }
+            System.out.println("\n\nShuffled Node List: ");
+            for(BC_ListNode listNode : shuffledNodeList) {
+                System.out.println(listNode.toString());
             }
             
         }

@@ -39,31 +39,6 @@ public class BC_BSTNode extends BC_GameNode {
         this.right = right;
     }
     
-    public boolean insertRecursive(int data) {
-        
-        boolean inserted;
-        if(data == super.getData())
-            inserted = false;
-        else if(data < super.getData()) {
-            if(left != null) 
-                inserted = left.insertRecursive(data);
-            else {
-                left = new BC_BSTNode(super.getNodeDepth() + 1, 2 * super.getNodeIndex() + 1, data);
-                inserted = true;
-            }
-        }
-        else {
-            if(right != null)
-                inserted = right.insertRecursive(data);
-            else {
-                right = new BC_BSTNode(super.getNodeDepth() + 1, 2 * super.getNodeDepth() + 2, data);
-                inserted = true;
-            }
-        }
-        
-        return inserted;
-    }
-    
     public void printNodeTraverse(String mode) {
         
         if(mode.matches("preorder"))

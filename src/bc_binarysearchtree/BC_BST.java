@@ -58,18 +58,6 @@ public class BC_BST {
         return inserted;
     }
     
-    public boolean insertRecursive(int data) {
-        boolean inserted;
-        if(root == null) {
-            root = new BC_BSTNode(0, 0, data);
-            inserted = true;
-        }
-        else 
-            inserted = root.insertRecursive(data);
-        
-        return inserted;
-    }
-    
     public void printNodeTraverse(String mode) {
         
         root.printNodeTraverse(mode);

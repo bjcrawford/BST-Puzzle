@@ -21,7 +21,7 @@ public class BC_Main implements SGMouseListener {
     static final int HEIGHT = 480;
     
     /* The difficulty level: 1-EASY, 2-MEDIUM, 3-HARD */
-    static int difficulty = 2;
+    static int difficulty = 3;
     
     /* The node size in pixels */
     static int nodeSize;
@@ -183,7 +183,7 @@ public class BC_Main implements SGMouseListener {
         // Ideally, you should be able to click and drag the nodes 
         // into a position on the tree.
         
-        drawNodes();
+        drawShuffledNodes();
     }
     
     private void visualizeTree(int x, int y, int childOffset, BC_BSTNode node) {
@@ -192,7 +192,7 @@ public class BC_Main implements SGMouseListener {
         node.setScreenX(x - nodeSize / 2);
         node.setScreenY(y);
         //gui.drawEllipse(x - nodeSize / 2, y, nodeSize, nodeSize, Color.BLACK, 1.0, 1, "");
-        gui.drawImage("res/" + node.getImageName(), x - nodeSize / 2, y, nodeSize, nodeSize, node.getImageName());
+        gui.drawImage("res/" + node.getImageName(), x - nodeSize / 2, y, nodeSize, nodeSize, "BST" + node.getNodeIndex());
         
         if(node.getLeft() != null) {
             int leftX = x - childOffset;
@@ -209,22 +209,43 @@ public class BC_Main implements SGMouseListener {
             
     }
     
-    private void drawNodes() {
+    private void drawShuffledNodes() {
+        
+        int offset = 10;
+        int x = offset;
+        int y = 400;
+        int spacing = ( WIDTH - (2 * offset) - (24 * numberOfNodes) ) / (numberOfNodes - 1);
+        
+        for(BC_ListNode listNode : shuffledNodeList) {
+            listNode.setScreenX(x);
+            listNode.setScreenY(y);
+            gui.drawImage("res/" + listNode.getImageName(), x, y, nodeSize, nodeSize, "SHF" + listNode.getNodeIndex());
+            x += nodeSize + spacing;
+        }
         
     }
     
-    private BC_BSTNode getNodeByScreenPos(int screenX, int screenY) {
+    private BC_GameNode getNodeByScreenPos(int screenX, int screenY) {
         
-        BC_BSTNode foundNode = null;
+        BC_GameNode foundNode = null;
         
-        for(BC_BSTNode bstNode : originalNodeList) {
-            if(screenX >= bstNode.getScreenX() && screenX <= bstNode.getScreenX() + nodeSize &&
-               screenY >= bstNode.getScreenY() && screenY <= bstNode.getScreenY() + nodeSize) {
-                foundNode = bstNode;
+        for(BC_GameNode gameNode : originalNodeList) {
+            if(screenX >= gameNode.getScreenX() && screenX <= gameNode.getScreenX() + nodeSize &&
+               screenY >= gameNode.getScreenY() && screenY <= gameNode.getScreenY() + nodeSize) {
+                foundNode = gameNode;
                 break;
             }
         }
         
+        if(foundNode == null) {
+            for(BC_GameNode gameNode : shuffledNodeList) {
+                if(screenX >= gameNode.getScreenX() && screenX <= gameNode.getScreenX() + nodeSize &&
+                   screenY >= gameNode.getScreenY() && screenY <= gameNode.getScreenY() + nodeSize) {
+                    foundNode = gameNode;
+                    break;
+                }
+            }
+        }
         
         return foundNode;
     }

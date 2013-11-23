@@ -20,8 +20,10 @@ public class BC_Main implements SGMouseListener {
     static final int WIDTH = 640;
     static final int HEIGHT = 480;
     
+    static boolean gameMode;
+    
     /* The difficulty level: 1-EASY, 2-MEDIUM, 3-HARD */
-    static int difficulty = 3;
+    static int difficulty;
     
     /* The node size in pixels */
     static int nodeSize;
@@ -44,19 +46,22 @@ public class BC_Main implements SGMouseListener {
     
     private BC_Main() {
         
-        showStartScreen();
-        // The show start screen will launch user into the main game
-        // in the finished project
-        
         initialize();
-        
+        showStartScreen();
         mainGame();
-        
         debugInfo();
     }
     
     private void initialize() {
+        gameMode = false;
         nodeSize = 24;
+        rand = new Random();
+        gui = new SimpleGUI(WIDTH, HEIGHT, false);
+        gui.registerToMouse(this);
+        
+    }
+    
+    private void gameInitialize() {
         
         if(difficulty == 3) {
             numberOfNodes = 23;
@@ -67,10 +72,6 @@ public class BC_Main implements SGMouseListener {
         else {
             numberOfNodes = 11;
         }
-        
-        rand = new Random();
-        gui = new SimpleGUI(WIDTH, HEIGHT, false);
-        gui.registerToMouse(this);
         
         prepareDataStructures();
     }
@@ -158,18 +159,34 @@ public class BC_Main implements SGMouseListener {
     }
     
     private void showStartScreen() {
-        // This will include 5 images
-        
-        // The first will be a title and a description 
-        // and maybe a picture of a BST
-        
-        // The second, third, and fourth will be clickable 
-        // images for easy, medium, and hard difficulty levels
-        
-        // The fifth will be my logo and credits
+        int[] mouse;
+        boolean notClicked = true;
+        gui.drawImage("res/title.png", 5, 0, 630, 240, "start");
+        gui.drawImage("res/buttons.png", 5, 240, 315, 240, "start");
+        gui.drawImage("res/rules.png", 320, 220, 315, 240, "start");
+        while(notClicked) {
+            mouse = gui.waitForMouseClick();
+            if(mouse[0] >= 79 && mouse[0] <= 249) {
+                if(mouse[1] >= 247 && mouse[1] <= 302) {
+                    difficulty = 1;
+                    notClicked = false;
+                }
+                else if(mouse[1] >= 312 && mouse[1] <= 365) {
+                    difficulty = 2;
+                    notClicked = false;
+                }
+                else if(mouse[1] >= 374 && mouse[1] <= 427) {
+                    difficulty = 3;
+                    notClicked = false;
+                }
+            }
+        }
+        gui.eraseAllDrawables("start");
     }
     
     private void mainGame() {
+        gameMode = true;
+        gameInitialize();
         drawUI();
         // The main game logic will go here
     }
@@ -278,7 +295,22 @@ public class BC_Main implements SGMouseListener {
     public void reactToMouseClick(int x, int y) {
         
         System.out.println("Mouse x,y: (" + x + "," + y + ")");
-        System.out.println(getNodeByScreenPos(x, y));
+        
+        if(gameMode) {
+            BC_GameNode gameNode = getNodeByScreenPos(x, y);
+            if(gameNode != null) {
+                if(gameNode.getClass() == BC_BSTNode.class) {
+                    // Game board mouse click
+                    System.out.println("BST: " + gameNode);
+                }
+                else {
+                    // Game peice mouse click
+                    System.out.println("SHF: " + gameNode);
+                }
+            }
+            else
+                System.out.println("blank space");
+        }
     }
     
 }

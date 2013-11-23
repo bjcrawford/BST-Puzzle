@@ -21,6 +21,9 @@ public class BC_Main implements SGMouseListener {
     static final int HEIGHT = 480;
     
     static boolean gameMode;
+    static boolean gameWon;
+    static boolean isPieceSelected;
+    static BC_GameNode pieceSelectedNode;
     
     /* The difficulty level: 1-EASY, 2-MEDIUM, 3-HARD */
     static int difficulty;
@@ -33,6 +36,8 @@ public class BC_Main implements SGMouseListener {
     
     /* The BST for which the game board is layed out */
     static BC_BST gameBoardModel;
+    
+    static int[] gameBoard;
     
     /* A randomized, ordered list used to create the tree */
     static LinkedList<Integer> originalIntList;
@@ -54,6 +59,8 @@ public class BC_Main implements SGMouseListener {
     
     private void initialize() {
         gameMode = false;
+        gameWon = false;
+        isPieceSelected = false;
         nodeSize = 24;
         rand = new Random();
         gui = new SimpleGUI(WIDTH, HEIGHT, false);
@@ -63,15 +70,12 @@ public class BC_Main implements SGMouseListener {
     
     private void gameInitialize() {
         
-        if(difficulty == 3) {
+        if(difficulty == 3)
             numberOfNodes = 23;
-        }
-        else if(difficulty == 2) {
+        else if(difficulty == 2) 
             numberOfNodes = 17;
-        }
-        else {
+        else 
             numberOfNodes = 11;
-        }
         
         prepareDataStructures();
     }
@@ -87,6 +91,8 @@ public class BC_Main implements SGMouseListener {
         
         createOriginalNodeList();
         createShuffledList();
+        
+        gameBoard = new int[31];
     }
     
     private void createOriginalIntList(int length) {
@@ -192,14 +198,8 @@ public class BC_Main implements SGMouseListener {
     }
     
     private void drawUI() {
-        // The UI will include the empty tree at the top of the screen
         
         visualizeTree(WIDTH / 2, 50, WIDTH / 4, gameBoardModel.getRoot());
-        
-        // At the bottom of the screen will be the node images
-        // Ideally, you should be able to click and drag the nodes 
-        // into a position on the tree.
-        
         drawShuffledNodes();
     }
     
@@ -208,7 +208,6 @@ public class BC_Main implements SGMouseListener {
         
         node.setScreenX(x - nodeSize / 2);
         node.setScreenY(y);
-        //gui.drawEllipse(x - nodeSize / 2, y, nodeSize, nodeSize, Color.BLACK, 1.0, 1, "");
         gui.drawImage("res/" + node.getImageName(), x - nodeSize / 2, y, nodeSize, nodeSize, "BST" + node.getNodeIndex());
         
         if(node.getLeft() != null) {
@@ -240,6 +239,15 @@ public class BC_Main implements SGMouseListener {
             x += nodeSize + spacing;
         }
         
+    }
+    
+    private void drawNode(int data, int x, int y, String guiLabel) {
+        String file = "" + (data <= 9 ? "0" : "") + data + ".png"; 
+        gui.drawImage("res/" + file, x, y, nodeSize, nodeSize, guiLabel);
+    }
+    
+    private void drawBlankNode(int x, int y, String guiLabel) {
+        gui.drawImage("res/blank.png", x, y, nodeSize, nodeSize, guiLabel);
     }
     
     private BC_GameNode getNodeByScreenPos(int screenX, int screenY) {
@@ -302,14 +310,63 @@ public class BC_Main implements SGMouseListener {
                 if(gameNode.getClass() == BC_BSTNode.class) {
                     // Game board mouse click
                     System.out.println("BST: " + gameNode);
+                    if(isPieceSelected) {
+                        System.out.println("input game piece");
+                        drawNode(pieceSelectedNode.getData(), gameNode.getScreenX(), gameNode.getScreenY(), "INS" + gameNode.getNodeIndex());
+                        gameBoard[gameNode.getNodeIndex()] = pieceSelectedNode.getData();
+                        int nodeX = pieceSelectedNode.getScreenX();
+                        int nodeY = pieceSelectedNode.getScreenY();
+                        System.out.println("X: " + nodeX + " | Y: " + nodeY);
+                        System.out.println("INS" + gameNode.getNodeIndex() + " | CLR" + gameNode.getNodeIndex());
+                        drawBlankNode(nodeX, nodeY, "CLR" + gameNode.getNodeIndex());
+                        gui.eraseAllDrawables("selection");
+                        isPieceSelected = false;
+                        pieceSelectedNode = null;
+                        
+                    }
+                    else {
+                        if(gameBoard[gameNode.getNodeIndex()] != 0) {
+                            System.out.println("filled node");
+                            System.out.println("INS" + gameNode.getNodeIndex() + " | CLR" + gameNode.getNodeIndex());
+                            gui.eraseAllDrawables("INS" + gameNode.getNodeIndex());
+                            gui.eraseAllDrawables("CLR" + gameNode.getNodeIndex());
+                            gameBoard[gameNode.getNodeIndex()] = 0;
+                        }
+                        else {
+                            System.out.println("empty node");
+                        }
+                    }
                 }
                 else {
                     // Game peice mouse click
                     System.out.println("SHF: " + gameNode);
+                    if(isPieceSelected) {
+                        gui.eraseAllDrawables("selection");
+                        isPieceSelected = false;
+                        pieceSelectedNode = null;
+                    }
+                    else {
+                        gui.drawFilledEllipse(gameNode.getScreenX(), gameNode.getScreenY(), nodeSize, nodeSize, Color.ORANGE, 0.5, "selection");
+                        isPieceSelected = true;
+                        pieceSelectedNode = gameNode;
+                    }
                 }
             }
-            else
+            else {
+                gui.eraseAllDrawables("selection");
+                isPieceSelected = false;
+                pieceSelectedNode = null;
                 System.out.println("blank space");
+            }
+            
+            checkForWin();
+        }
+        
+    }
+    
+    private void checkForWin() {
+        for(BC_GameNode gameNode : originalNodeList) {
+            
         }
     }
     

@@ -24,23 +24,23 @@ public class BC_BST {
         return root.getNode(data);
     }
     
-    public boolean insertIterative(int d) {
+    public boolean insertIterative(int data) {
         BC_BSTNode current = root;
         boolean inserted = false;
         
         if(root == null) {
-            root = new BC_BSTNode(d, 0, 0);
+            root = new BC_BSTNode(0, 0, data);
             inserted = true;
         }
         else {
             while(!inserted) {
-                if(d == current.getData())
+                if(data == current.getData())
                     break;
-                else if(d < current.getData()) {
+                else if(data < current.getData()) {
                     if(current.getLeft() != null) 
                         current = current.getLeft();
                     else {
-                        current.setLeft(new BC_BSTNode(d, current.getDepth() + 1, 2 * current.getTreeIndex() + 1));
+                        current.setLeft(new BC_BSTNode(current.getNodeDepth() + 1, 2 * current.getNodeIndex() + 1, data));
                         inserted = true;
                     }
                 }
@@ -48,7 +48,7 @@ public class BC_BST {
                     if(current.getRight() != null)
                         current = current.getRight();
                     else {
-                        current.setRight(new BC_BSTNode(d, current.getDepth() + 1, 2 * current.getTreeIndex() + 2));
+                        current.setRight(new BC_BSTNode(current.getNodeDepth() + 1, 2 * current.getNodeIndex() + 2, data));
                         inserted = true;
                     }
                 }
@@ -58,14 +58,14 @@ public class BC_BST {
         return inserted;
     }
     
-    public boolean insertRecursive(int d) {
+    public boolean insertRecursive(int data) {
         boolean inserted;
         if(root == null) {
-            root = new BC_BSTNode(d, 0, 0);
+            root = new BC_BSTNode(0, 0, data);
             inserted = true;
         }
         else 
-            inserted = root.insertRecursive(d);
+            inserted = root.insertRecursive(data);
         
         return inserted;
     }

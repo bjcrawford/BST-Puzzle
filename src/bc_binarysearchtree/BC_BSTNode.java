@@ -1,61 +1,22 @@
 package bc_binarysearchtree;
 
-import bc_listnode.BC_ListNode;
+import bc_gamenode.BC_GameNode;
 import java.util.LinkedList;
 
 /**
  *
  * @author Brett Crawford (brett.crawford@temple.edu)
  */
-public class BC_BSTNode {
+public class BC_BSTNode extends BC_GameNode {
 
-    private int depth;
-    private int treeIndex;
-    private Integer data;
-    private int screenX;
-    private int screenY;
-    private String imageName;
     private BC_BSTNode left;
     private BC_BSTNode right;
     
-    public BC_BSTNode(int data, int depth, int treeIndex) {
+    public BC_BSTNode(int nodeDepth, int nodeIndex, int data) {
         
-        this.depth = depth;
-        this.treeIndex = treeIndex;
-        this.data = data;
-        imageName = "" + (data <= 9 ? "0" : "") + data + ".png"; 
+        super(nodeDepth, nodeIndex, data);
         left = null;
         right = null;
-    }
-    
-    public int getDepth() {
-        
-        return depth;
-    }
-    
-    public int getTreeIndex() {
-        
-        return treeIndex;
-    }
-    
-    public Integer getData() {
-        
-        return data;
-    }
-    
-    public Integer getScreenX() {
-        
-        return screenX;
-    }
-    
-    public Integer getScreenY() {
-        
-        return screenY;
-    }
-    
-    public String getImageName() {
-        
-        return imageName;
     }
     
     public BC_BSTNode getLeft() {
@@ -68,16 +29,6 @@ public class BC_BSTNode {
         return right;
     }
     
-    public void setScreenX(int screenX) {
-        
-        this.screenX = screenX;
-    }
-    
-    public void setScreenY(int screenY) {
-        
-        this.screenY = screenY;
-    }
-    
     public void setLeft(BC_BSTNode left) {
         
         this.left = left;
@@ -88,24 +39,24 @@ public class BC_BSTNode {
         this.right = right;
     }
     
-    public boolean insertRecursive(int d) {
+    public boolean insertRecursive(int data) {
         
         boolean inserted;
-        if(d == data)
+        if(data == super.getData())
             inserted = false;
-        else if(d < data) {
+        else if(data < super.getData()) {
             if(left != null) 
-                inserted = left.insertRecursive(d);
+                inserted = left.insertRecursive(data);
             else {
-                left = new BC_BSTNode(d, this.depth + 1, 2 * this.treeIndex + 1);
+                left = new BC_BSTNode(super.getNodeDepth() + 1, 2 * super.getNodeIndex() + 1, data);
                 inserted = true;
             }
         }
         else {
             if(right != null)
-                inserted = right.insertRecursive(d);
+                inserted = right.insertRecursive(data);
             else {
-                right = new BC_BSTNode(d, this.depth + 1, 2 * this.treeIndex + 2);
+                right = new BC_BSTNode(super.getNodeDepth() + 1, 2 * super.getNodeDepth() + 2, data);
                 inserted = true;
             }
         }
@@ -131,24 +82,24 @@ public class BC_BSTNode {
     public void dataListTraverse(String mode, LinkedList<Integer> list) {
         
         if(mode.matches("preorder"))
-            list.addLast(this.data);
+            list.addLast(super.getData());
         if(left != null) 
             left.dataListTraverse(mode, list);
         if(mode.matches("inorder"))
-            list.addLast(this.data);
+            list.addLast(super.getData());
         if(right != null) 
             right.dataListTraverse(mode, list);
         if(mode.matches("postorder"))
-            list.addLast(this.data);
+            list.addLast(super.getData());
     }
     
     public BC_BSTNode getNode(int data) {
         
         BC_BSTNode foundNode = null;
         
-        if(data < this.data && this.left != null) 
+        if(data < super.getData() && this.left != null) 
             foundNode = this.left.getNode(data);
-        else if(data > this.data && this.right != null) 
+        else if(data > super.getData() && this.right != null) 
             foundNode = this.right.getNode(data);
         else 
             foundNode = this;
@@ -159,8 +110,8 @@ public class BC_BSTNode {
     public int maxDepthTraverse() {
         
         int max = 0, leftMax = 0, rightMax = 0;
-        if(depth > max)
-            max = depth;
+        if(super.getNodeDepth() > max)
+            max = super.getNodeDepth();
         if(left != null)
             leftMax = left.maxDepthTraverse();
         if(leftMax > max)
@@ -177,7 +128,8 @@ public class BC_BSTNode {
     @Override
     public String toString() {
         
-        return "Data: " + data + " | Image: " + imageName + " | Depth: " + depth + 
-               " | Index: " + treeIndex + " | x: " + screenX + " | y: " + screenY;
+        return "Data: " + super.getData() + " | Image: " + super.getImageName() + 
+               " | Depth: " + super.getNodeDepth() + " | Index: " + super.getNodeIndex() + 
+               " | x: " + super.getScreenX() + " | y: " + super.getScreenY();
     }
 }

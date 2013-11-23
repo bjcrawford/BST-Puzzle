@@ -1,7 +1,8 @@
 package bc_main;
 
+import bc_gamenode.BC_GameNode;
 import bc_binarysearchtree.*;
-import bc_listnode.*;
+import bc_listnode.BC_ListNode;
 import java.awt.Color;
 import java.util.LinkedList;
 import java.util.Random;
@@ -36,7 +37,7 @@ public class BC_Main implements SGMouseListener {
     static LinkedList<BC_BSTNode> originalNodeList;
     
     /* A shuffled version of the original list */
-    static LinkedList<BC_ListNode> shuffledNodeList;
+    static LinkedList<BC_GameNode> shuffledNodeList;
     
     static Random rand;
     static SimpleGUI gui;
@@ -111,7 +112,11 @@ public class BC_Main implements SGMouseListener {
     
     private void createShuffledList() {
         
-        shuffledNodeList = new LinkedList<BC_ListNode>();
+        int nodeDepth;
+        int nodeIndex;
+        int data;
+        BC_BSTNode bstNode;
+        shuffledNodeList = new LinkedList<BC_GameNode>();
         
         boolean[] arr = new boolean[numberOfNodes];
         for(int i = 0; i < numberOfNodes; i ++)
@@ -119,7 +124,11 @@ public class BC_Main implements SGMouseListener {
         while(!isBooleanArrayTrue(arr)) {
             int pos = rand.nextInt(numberOfNodes);
             if(arr[pos] == false) {
-                shuffledNodeList.add(new BC_ListNode(gameBoardModel.getNode(originalIntList.get(pos))));
+                bstNode = gameBoardModel.getNode(originalIntList.get(pos));
+                nodeDepth = bstNode.getNodeDepth();
+                nodeIndex = bstNode.getNodeIndex();
+                data = bstNode.getData();
+                shuffledNodeList.add(new BC_ListNode(nodeDepth, nodeIndex, data));
                 arr[pos] = true;
             }
         }
@@ -234,7 +243,7 @@ public class BC_Main implements SGMouseListener {
                 System.out.println(bstNode.toString());
             }
             System.out.println("\n\nShuffled Node List: ");
-            for(BC_ListNode listNode : shuffledNodeList) {
+            for(BC_GameNode listNode : shuffledNodeList) {
                 System.out.println(listNode.toString());
             }
             

@@ -19,7 +19,7 @@ public class BC_Main implements SGMouseListener {
     static final int HEIGHT = 480;
     
     /* The difficulty level: 1-EASY, 2-MEDIUM, 3-HARD */
-    static int difficulty = 1;
+    static int difficulty = 2;
     
     /* The node size in pixels */
     static int nodeSize;

@@ -37,7 +37,7 @@ public class BC_Main implements SGMouseListener {
     static LinkedList<BC_BSTNode> originalNodeList;
     
     /* A shuffled version of the original list */
-    static LinkedList<BC_GameNode> shuffledNodeList;
+    static LinkedList<BC_ListNode> shuffledNodeList;
     
     static Random rand;
     static SimpleGUI gui;
@@ -116,7 +116,8 @@ public class BC_Main implements SGMouseListener {
         int nodeIndex;
         int data;
         BC_BSTNode bstNode;
-        shuffledNodeList = new LinkedList<BC_GameNode>();
+        BC_ListNode listNode;
+        shuffledNodeList = new LinkedList<BC_ListNode>();
         
         boolean[] arr = new boolean[numberOfNodes];
         for(int i = 0; i < numberOfNodes; i ++)
@@ -128,7 +129,9 @@ public class BC_Main implements SGMouseListener {
                 nodeDepth = bstNode.getNodeDepth();
                 nodeIndex = bstNode.getNodeIndex();
                 data = bstNode.getData();
-                shuffledNodeList.add(new BC_ListNode(nodeDepth, nodeIndex, data));
+                listNode = new BC_ListNode(nodeDepth, nodeIndex, data);
+                listNode.setIsImageOn(true);
+                shuffledNodeList.add(listNode);
                 arr[pos] = true;
             }
         }

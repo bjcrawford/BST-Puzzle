@@ -20,9 +20,16 @@ public class BC_Main implements SGMouseListener {
     static final int WIDTH = 640;
     static final int HEIGHT = 480;
     
+    /* A flag to mark the app in game mode */
     static boolean gameMode;
+    
+    /* A flag to mark when game mode has been won */
     static boolean gameWon;
+    
+    /* A flag to mark when a game piece is selected */
     static boolean isPieceSelected;
+    
+    /* A reference to the selected game piece */
     static BC_GameNode pieceSelectedNode;
     
     /* The difficulty level: 1-EASY, 2-MEDIUM, 3-HARD */
@@ -37,8 +44,13 @@ public class BC_Main implements SGMouseListener {
     /* The BST for which the game board is layed out */
     static BC_BST gameBoardModel;
     
+    /* An array for representing the user's solution for the BT. 
+       array[solutionNodeIndex]:guessNodeIndex */
     static int[] gameBoard;
     
+    /* An array for representing the game spaces' image states 
+       array[nodeIndex + x]:imageState
+       x is 0 for BT spaces, x is 31 for game piece spaces */
     static boolean[] gameSpaces;
     
     /* A randomized, ordered list used to create the tree */
@@ -399,7 +411,8 @@ public class BC_Main implements SGMouseListener {
         
         if(won) {
             System.out.println("You Win!");
-            gameWon = won;
+            gameWon = true;
+            gameMode = false;
         }
     }
     

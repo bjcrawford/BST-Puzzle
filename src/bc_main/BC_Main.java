@@ -39,6 +39,8 @@ public class BC_Main implements SGMouseListener {
     
     static int[] gameBoard;
     
+    static boolean[] gameSpaces;
+    
     /* A randomized, ordered list used to create the tree */
     static LinkedList<Integer> originalIntList;
     static LinkedList<BC_BSTNode> originalNodeList;
@@ -93,6 +95,9 @@ public class BC_Main implements SGMouseListener {
         createShuffledList();
         
         gameBoard = new int[31];
+        for(int i = 0; i < 31; i++)
+            gameBoard[i] = -1;
+        gameSpaces = new boolean[62];
     }
     
     private void createOriginalIntList(int length) {
@@ -208,6 +213,7 @@ public class BC_Main implements SGMouseListener {
         
         node.setScreenX(x - nodeSize / 2);
         node.setScreenY(y);
+        gameSpaces[node.getNodeIndex()] = false;
         gui.drawImage("res/" + node.getImageName(), x - nodeSize / 2, y, nodeSize, nodeSize, "BST" + node.getNodeIndex());
         
         if(node.getLeft() != null) {
@@ -235,6 +241,7 @@ public class BC_Main implements SGMouseListener {
         for(BC_ListNode listNode : shuffledNodeList) {
             listNode.setScreenX(x);
             listNode.setScreenY(y);
+            gameSpaces[listNode.getNodeIndex() + 31] = true;
             gui.drawImage("res/" + listNode.getImageName(), x, y, nodeSize, nodeSize, "SHF" + listNode.getNodeIndex());
             x += nodeSize + spacing;
         }
@@ -306,53 +313,63 @@ public class BC_Main implements SGMouseListener {
         
         if(gameMode) {
             BC_GameNode gameNode = getNodeByScreenPos(x, y);
-            if(gameNode != null) {
-                if(gameNode.getClass() == BC_BSTNode.class) {
-                    // Game board mouse click
+            
+            if(gameNode != null) { // Game node mouse click
+                
+                if(gameNode.getClass() == BC_BSTNode.class) { // Game board mouse click
+                    
                     System.out.println("BST: " + gameNode);
-                    if(isPieceSelected) {
+                    
+                    if(isPieceSelected) { // Input game piece
                         System.out.println("input game piece");
                         drawNode(pieceSelectedNode.getData(), gameNode.getScreenX(), gameNode.getScreenY(), "INS" + gameNode.getNodeIndex());
-                        gameBoard[gameNode.getNodeIndex()] = pieceSelectedNode.getData();
+                        gameBoard[gameNode.getNodeIndex()] = pieceSelectedNode.getNodeIndex();
+                        gameSpaces[gameNode.getNodeIndex()] = true;
                         int nodeX = pieceSelectedNode.getScreenX();
                         int nodeY = pieceSelectedNode.getScreenY();
                         System.out.println("X: " + nodeX + " | Y: " + nodeY);
                         System.out.println("INS" + gameNode.getNodeIndex() + " | CLR" + gameNode.getNodeIndex());
                         drawBlankNode(nodeX, nodeY, "CLR" + gameNode.getNodeIndex());
+                        gameSpaces[pieceSelectedNode.getNodeIndex() + 31] = false;
                         gui.eraseAllDrawables("selection");
                         isPieceSelected = false;
                         pieceSelectedNode = null;
                         
                     }
-                    else {
-                        if(gameBoard[gameNode.getNodeIndex()] != 0) {
+                    else { // Clear game board spot
+                        if(gameBoard[gameNode.getNodeIndex()] != -1) {
                             System.out.println("filled node");
                             System.out.println("INS" + gameNode.getNodeIndex() + " | CLR" + gameNode.getNodeIndex());
                             gui.eraseAllDrawables("INS" + gameNode.getNodeIndex());
+                            gameSpaces[gameBoard[gameNode.getNodeIndex()]] = false;
                             gui.eraseAllDrawables("CLR" + gameNode.getNodeIndex());
-                            gameBoard[gameNode.getNodeIndex()] = 0;
+                            gameSpaces[gameNode.getNodeIndex() + 31] = true;
+                            gameBoard[gameNode.getNodeIndex()] = -1;
                         }
                         else {
                             System.out.println("empty node");
                         }
                     }
                 }
-                else {
-                    // Game peice mouse click
+                else { // Game piece mouse click
+                    
                     System.out.println("SHF: " + gameNode);
-                    if(isPieceSelected) {
+                    
+                    if(isPieceSelected) { // Clear game piece selection
                         gui.eraseAllDrawables("selection");
                         isPieceSelected = false;
                         pieceSelectedNode = null;
                     }
-                    else {
-                        gui.drawFilledEllipse(gameNode.getScreenX(), gameNode.getScreenY(), nodeSize, nodeSize, Color.ORANGE, 0.5, "selection");
-                        isPieceSelected = true;
-                        pieceSelectedNode = gameNode;
+                    else { // Select game piece 
+                        if(gameSpaces[gameNode.getNodeIndex() + 31]) {
+                            gui.drawFilledEllipse(gameNode.getScreenX(), gameNode.getScreenY(), nodeSize, nodeSize, Color.ORANGE, 0.5, "selection");
+                            isPieceSelected = true;
+                            pieceSelectedNode = gameNode;
+                        }
                     }
                 }
             }
-            else {
+            else { // Blank space mouse click
                 gui.eraseAllDrawables("selection");
                 isPieceSelected = false;
                 pieceSelectedNode = null;
@@ -365,8 +382,24 @@ public class BC_Main implements SGMouseListener {
     }
     
     private void checkForWin() {
+        
+        boolean won = true;
+        
+        System.out.println("Checking for win:");
+        
         for(BC_GameNode gameNode : originalNodeList) {
-            
+            System.out.println("gameBoard[" + gameNode.getNodeIndex() + "]: " + 
+                               gameBoard[gameNode.getNodeIndex()] + " | gameNode.getNodeIndex(): " + 
+                               gameNode.getNodeIndex());
+            if(gameBoard[gameNode.getNodeIndex()] != gameNode.getNodeIndex()) {
+                won = false;
+                break;
+            }
+        }
+        
+        if(won) {
+            System.out.println("You Win!");
+            gameWon = won;
         }
     }
     

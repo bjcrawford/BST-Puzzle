@@ -20,11 +20,13 @@ public class BC_Main implements SGMouseListener {
     static final int WIDTH = 640;
     static final int HEIGHT = 480;
     
-    /* A flag to mark the app in game mode */
+    /* A flags to mark the game in various modes */
+    static boolean startMode;
     static boolean gameMode;
+    static boolean endMode;
     
-    /* A flag to mark when game mode has been won */
-    static boolean gameWon;
+    /* A flag to mark when game is finished */
+    static boolean gameOver;
     
     /* A flag to mark when a game piece is selected */
     static boolean isPieceSelected;
@@ -53,8 +55,14 @@ public class BC_Main implements SGMouseListener {
        x is 0 for BT spaces, x is 31 for game piece spaces */
     static boolean[] gameSpaces;
     
+    /* A list containing the string labels of all the images used
+       to alter game spaces' image states. Used to reset the gameboard */
+    static LinkedList<String> guiLabelList;
+    
     /* A randomized, ordered list used to create the tree */
     static LinkedList<Integer> originalIntList;
+    
+    /* A list that holds references to the BT nodes */
     static LinkedList<BC_BSTNode> originalNodeList;
     
     /* A shuffled version of the original list */
@@ -65,20 +73,38 @@ public class BC_Main implements SGMouseListener {
     
     private BC_Main() {
         
-        initialize();
-        showStartScreen();
-        mainGame();
-        debugInfo();
+        oneTimeInit();
+        launchGame();
     }
     
-    private void initialize() {
-        gameMode = false;
-        gameWon = false;
-        isPieceSelected = false;
+    private void launchGame() {
+        
+        while(true) {
+            initialize();
+            drawStartScreen();
+            while(startMode) {}
+            mainGame();
+            debugInfo();
+            while(!gameOver) {}
+        }
+        
+    }
+    
+    private void oneTimeInit() {
+        
         nodeSize = 24;
         rand = new Random();
         gui = new SimpleGUI(WIDTH, HEIGHT, false);
         gui.registerToMouse(this);
+    }
+    
+    private void initialize() {
+        
+        startMode = false;
+        gameMode = false;
+        endMode = false;
+        gameOver = false;
+        isPieceSelected = false;
         
     }
     
@@ -103,6 +129,7 @@ public class BC_Main implements SGMouseListener {
             createTree();
         } while(gameBoardModel.getMaxDepth() > 4);
         
+        guiLabelList = new LinkedList<String>();
         createOriginalNodeList();
         createShuffledList();
         
@@ -181,12 +208,14 @@ public class BC_Main implements SGMouseListener {
         }
     }
     
-    private void showStartScreen() {
-        int[] mouse;
-        boolean notClicked = true;
+    private void drawStartScreen() {
+        //int[] mouse;
+        //boolean notClicked = true;
+        startMode = true;
         gui.drawImage("res/title.png", 5, 0, 630, 240, "start");
         gui.drawImage("res/buttons.png", 5, 240, 315, 240, "start");
         gui.drawImage("res/rules.png", 320, 220, 315, 240, "start");
+        /*
         while(notClicked) {
             mouse = gui.waitForMouseClick();
             if(mouse[0] >= 79 && mouse[0] <= 249) {
@@ -205,19 +234,21 @@ public class BC_Main implements SGMouseListener {
             }
         }
         gui.eraseAllDrawables("start");
+        */
     }
     
     private void mainGame() {
         gameMode = true;
         gameInitialize();
         drawUI();
-        // The main game logic will go here
     }
     
     private void drawUI() {
         
-        visualizeTree(WIDTH / 2, 50, WIDTH / 4, gameBoardModel.getRoot());
+        visualizeTree(WIDTH / 2, 30, WIDTH / 4, gameBoardModel.getRoot());
         drawShuffledNodes();
+        gui.drawImage("res/instructions.png", 10, 335, 430, 140, "instuctions");
+        gui.drawImage("res/buttons2.png", 445, 340, 188, 130, "buttons2");
     }
     
     private void visualizeTree(int x, int y, int childOffset, BC_BSTNode node) {
@@ -247,7 +278,7 @@ public class BC_Main implements SGMouseListener {
         
         int offset = 10;
         int x = offset;
-        int y = 400;
+        int y = 275;
         int spacing = ( WIDTH - (2 * offset) - (24 * numberOfNodes) ) / (numberOfNodes - 1);
         
         for(BC_ListNode listNode : shuffledNodeList) {
@@ -263,16 +294,24 @@ public class BC_Main implements SGMouseListener {
     private void drawNode(int data, int x, int y, String guiLabel) {
         String file = "" + (data <= 9 ? "0" : "") + data + ".png"; 
         gui.drawImage("res/" + file, x, y, nodeSize, nodeSize, guiLabel);
+        guiLabelList.push(guiLabel);
     }
     
     private void drawBlankNode(int x, int y, String guiLabel) {
         gui.drawImage("res/blank.png", x, y, nodeSize, nodeSize, guiLabel);
+        guiLabelList.push(guiLabel);
+    }
+    
+    private void drawWinScreen() {
+        gui.eraseAllDrawables();
+        gui.drawImage("res/win.png", 0, 0, 640, 480, "win");
     }
     
     private BC_GameNode getNodeByScreenPos(int screenX, int screenY) {
         
         BC_GameNode foundNode = null;
         
+        // Check for game board node
         for(BC_GameNode gameNode : originalNodeList) {
             if(screenX >= gameNode.getScreenX() && screenX <= gameNode.getScreenX() + nodeSize &&
                screenY >= gameNode.getScreenY() && screenY <= gameNode.getScreenY() + nodeSize) {
@@ -281,6 +320,7 @@ public class BC_Main implements SGMouseListener {
             }
         }
         
+        // Check for game piece node
         if(foundNode == null) {
             for(BC_GameNode gameNode : shuffledNodeList) {
                 if(screenX >= gameNode.getScreenX() && screenX <= gameNode.getScreenX() + nodeSize &&
@@ -292,6 +332,17 @@ public class BC_Main implements SGMouseListener {
         }
         
         return foundNode;
+    }
+    
+    public void resetGameBoard() {
+        while(!guiLabelList.isEmpty()) {
+            gui.eraseAllDrawables(guiLabelList.pop());
+        }
+        for(int i = 0; i < 31; i++) {
+            gameBoard[i] = -1;
+            gameSpaces[i] = false;
+            gameSpaces[i + 31] = true;
+        }
     }
 
     public static void main(String[] args) {
@@ -317,13 +368,36 @@ public class BC_Main implements SGMouseListener {
             
         }
     }
+    
+    private void handleStartModeClick(int x, int y) {
+         
+        if(x >= 79 && x <= 249) {
+            if(y >= 247 && y <= 302) {
+                difficulty = 1;
+                startMode = false;
+            }
+            else if(y >= 312 && y <= 365) {
+                difficulty = 2;
+                startMode = false;
+            }
+            else if(y >= 374 && y <= 427) {
+                difficulty = 3;
+                startMode = false;
+            }
+        }
+
+        gui.eraseAllDrawables("start");
+    }
 
     @Override
     public void reactToMouseClick(int x, int y) {
         
         System.out.println("Mouse x,y: (" + x + "," + y + ")");
         
-        if(gameMode) {
+        if(startMode) {
+            handleStartModeClick(x, y);
+        }
+        else if(gameMode) {
             BC_GameNode gameNode = getNodeByScreenPos(x, y);
             
             if(gameNode != null) { // Game node mouse click
@@ -386,9 +460,27 @@ public class BC_Main implements SGMouseListener {
                 isPieceSelected = false;
                 pieceSelectedNode = null;
                 System.out.println("blank space");
+                
+                // Check for button click
+                if(x >= 455 && x <= 624 && y >= 346 && y <= 399) {
+                    // Reset 
+                    resetGameBoard();
+                }
+                else if(x >= 455 && x <= 624 && y >= 410 && y <= 462) {
+                    // Quit
+                    gui.eraseAllDrawables();
+                    gameMode = false;
+                    gameOver = true;
+                }
+                
             }
             
             checkForWin();
+        }
+        else if(endMode) {
+            endMode = false;
+            gameOver = true;
+            gui.eraseAllDrawables();
         }
         
     }
@@ -400,9 +492,11 @@ public class BC_Main implements SGMouseListener {
         System.out.println("Checking for win:");
         
         for(BC_GameNode gameNode : originalNodeList) {
-            System.out.println("gameBoard[" + gameNode.getNodeIndex() + "]: " + 
+            if(DEBUG)
+                System.out.println("gameBoard[" + gameNode.getNodeIndex() + "]: " + 
                                gameBoard[gameNode.getNodeIndex()] + " | gameNode.getNodeIndex(): " + 
                                gameNode.getNodeIndex());
+            
             if(gameBoard[gameNode.getNodeIndex()] != gameNode.getNodeIndex()) {
                 won = false;
                 break;
@@ -411,8 +505,9 @@ public class BC_Main implements SGMouseListener {
         
         if(won) {
             System.out.println("You Win!");
-            gameWon = true;
             gameMode = false;
+            endMode = true;
+            drawWinScreen();
         }
     }
     

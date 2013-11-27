@@ -14,7 +14,7 @@ import simplegui.*;
  */
 public class BC_Main implements SGMouseListener {
     
-    static final boolean DEBUG = true;
+    static final boolean DEBUG = false;
     
     /* The width and height of the GUI window */
     static final int WIDTH = 640;
@@ -208,17 +208,17 @@ public class BC_Main implements SGMouseListener {
         }
     }
     
+    private void mainGame() {
+        gameMode = true;
+        gameInitialize();
+        drawUI();
+    }
+    
     private void drawStartScreen() {
         startMode = true;
         gui.drawImage("res/title.png", 5, 0, 630, 240, "start");
         gui.drawImage("res/buttons.png", 5, 240, 315, 240, "start");
         gui.drawImage("res/rules.png", 320, 220, 315, 240, "start");
-    }
-    
-    private void mainGame() {
-        gameMode = true;
-        gameInitialize();
-        drawUI();
     }
     
     private void drawUI() {
@@ -230,7 +230,6 @@ public class BC_Main implements SGMouseListener {
     }
     
     private void visualizeTree(int x, int y, int childOffset, BC_BSTNode node) {
-        
         
         node.setScreenX(x - nodeSize / 2);
         node.setScreenY(y);
@@ -249,7 +248,6 @@ public class BC_Main implements SGMouseListener {
             gui.drawLine(x, y + nodeSize, rightX, rightY);
             visualizeTree(rightX, rightY, childOffset / 2, node.getRight());
         }
-            
     }
     
     private void drawShuffledNodes() {
@@ -266,7 +264,6 @@ public class BC_Main implements SGMouseListener {
             gui.drawImage("res/" + listNode.getImageName(), x, y, nodeSize, nodeSize, "SHF" + listNode.getNodeIndex());
             x += nodeSize + spacing;
         }
-        
     }
     
     private void drawNode(int data, int x, int y, String guiLabel) {
@@ -285,33 +282,6 @@ public class BC_Main implements SGMouseListener {
         gui.drawImage("res/win.png", 0, 0, 640, 480, "win");
     }
     
-    private BC_GameNode getNodeByScreenPos(int screenX, int screenY) {
-        
-        BC_GameNode foundNode = null;
-        
-        // Check for game board node
-        for(BC_GameNode gameNode : originalNodeList) {
-            if(screenX >= gameNode.getScreenX() && screenX <= gameNode.getScreenX() + nodeSize &&
-               screenY >= gameNode.getScreenY() && screenY <= gameNode.getScreenY() + nodeSize) {
-                foundNode = gameNode;
-                break;
-            }
-        }
-        
-        // Check for game piece node
-        if(foundNode == null) {
-            for(BC_GameNode gameNode : shuffledNodeList) {
-                if(screenX >= gameNode.getScreenX() && screenX <= gameNode.getScreenX() + nodeSize &&
-                   screenY >= gameNode.getScreenY() && screenY <= gameNode.getScreenY() + nodeSize) {
-                    foundNode = gameNode;
-                    break;
-                }
-            }
-        }
-        
-        return foundNode;
-    }
-    
     public void resetGameBoard() {
         while(!guiLabelList.isEmpty()) {
             gui.eraseAllDrawables(guiLabelList.pop());
@@ -323,28 +293,21 @@ public class BC_Main implements SGMouseListener {
         }
     }
 
-    public static void main(String[] args) {
-        new BC_Main();
-    }
-    
-    private void debugInfo() {
+    @Override
+    public void reactToMouseClick(int x, int y) {
+        if(DEBUG)
+            System.out.println("Mouse x,y: (" + x + "," + y + ")");
         
-        if(DEBUG) {
-            System.out.println("\n\nTree Inorder Traversal: ");
-            gameBoardModel.printNodeTraverse("inorder");
-            System.out.println("\n\nOriginal Int List: ");
-            for(Integer i : originalIntList) 
-                System.out.print(i + ", ");
-            System.out.println("\n\nOriginal Node List: ");
-            for(BC_BSTNode bstNode : originalNodeList) {
-                System.out.println(bstNode.toString());
-            }
-            System.out.println("\n\nShuffled Node List: ");
-            for(BC_GameNode listNode : shuffledNodeList) {
-                System.out.println(listNode.toString());
-            }
-            
+        if(startMode) {
+            handleStartModeClick(x, y);
         }
+        else if(gameMode) {
+            handleGameModeClick(x, y);
+        }
+        else if(endMode) {
+            handleEndModeClick(x, y);
+        }
+        
     }
     
     private void handleStartModeClick(int x, int y) {
@@ -399,7 +362,7 @@ public class BC_Main implements SGMouseListener {
                         gui.eraseAllDrawables("INS" + gameNode.getNodeIndex());
                         gameSpaces[gameBoard[gameNode.getNodeIndex()]] = false;
                         gui.eraseAllDrawables("CLR" + gameNode.getNodeIndex());
-                        gameSpaces[gameNode.getNodeIndex() + 31] = true;
+                        gameSpaces[gameBoard[gameNode.getNodeIndex()] + 31] = true;
                         gameBoard[gameNode.getNodeIndex()] = -1;
                         
                         if(DEBUG) {
@@ -417,6 +380,9 @@ public class BC_Main implements SGMouseListener {
                     pieceSelectedNode = null;
                 }
                 else { // Select game piece 
+                    if(DEBUG)
+                        System.out.println("gameSpaces[" + (gameNode.getNodeIndex() + 31) + "]: " + gameSpaces[gameNode.getNodeIndex() + 31]);
+                    
                     if(gameSpaces[gameNode.getNodeIndex() + 31]) {
                         gui.drawFilledEllipse(gameNode.getScreenX(), gameNode.getScreenY(), nodeSize, nodeSize, Color.ORANGE, 0.5, "selection");
                         isPieceSelected = true;
@@ -455,29 +421,39 @@ public class BC_Main implements SGMouseListener {
         gameOver = true;
         gui.eraseAllDrawables();
     }
-
-    @Override
-    public void reactToMouseClick(int x, int y) {
+    
+    private BC_GameNode getNodeByScreenPos(int screenX, int screenY) {
         
-        System.out.println("Mouse x,y: (" + x + "," + y + ")");
+        BC_GameNode foundNode = null;
         
-        if(startMode) {
-            handleStartModeClick(x, y);
-        }
-        else if(gameMode) {
-            handleGameModeClick(x, y);
-        }
-        else if(endMode) {
-            handleEndModeClick(x, y);
+        // Check for game board node
+        for(BC_GameNode gameNode : originalNodeList) {
+            if(screenX >= gameNode.getScreenX() && screenX <= gameNode.getScreenX() + nodeSize &&
+               screenY >= gameNode.getScreenY() && screenY <= gameNode.getScreenY() + nodeSize) {
+                foundNode = gameNode;
+                break;
+            }
         }
         
+        // Check for game piece node
+        if(foundNode == null) {
+            for(BC_GameNode gameNode : shuffledNodeList) {
+                if(screenX >= gameNode.getScreenX() && screenX <= gameNode.getScreenX() + nodeSize &&
+                   screenY >= gameNode.getScreenY() && screenY <= gameNode.getScreenY() + nodeSize) {
+                    foundNode = gameNode;
+                    break;
+                }
+            }
+        }
+        
+        return foundNode;
     }
     
     private void checkForWin() {
         
         boolean won = true;
-        
-        System.out.println("Checking for win:");
+        if(DEBUG)
+            System.out.println("Checking for win:");
         
         for(BC_GameNode gameNode : originalNodeList) {
             if(DEBUG)
@@ -492,11 +468,35 @@ public class BC_Main implements SGMouseListener {
         }
         
         if(won) {
-            System.out.println("You Win!");
+            if(DEBUG)
+                System.out.println("You Win!");
             gameMode = false;
             endMode = true;
             drawWinScreen();
         }
     }
     
+    private void debugInfo() {
+        
+        if(DEBUG) {
+            System.out.println("\n\nTree Inorder Traversal: ");
+            gameBoardModel.printNodeTraverse("inorder");
+            System.out.println("\n\nOriginal Int List: ");
+            for(Integer i : originalIntList) 
+                System.out.print(i + ", ");
+            System.out.println("\n\nOriginal Node List: ");
+            for(BC_BSTNode bstNode : originalNodeList) {
+                System.out.println(bstNode.toString());
+            }
+            System.out.println("\n\nShuffled Node List: ");
+            for(BC_GameNode listNode : shuffledNodeList) {
+                System.out.println(listNode.toString());
+            }
+            
+        }
+    }
+
+    public static void main(String[] args) {
+        new BC_Main();
+    }
 }

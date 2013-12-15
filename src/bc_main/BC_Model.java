@@ -36,13 +36,14 @@ public class BC_Model {
     /* The BST for which the game board is layed out */
     private BC_BST gameBoardModel;
     
-    /* An array for representing the user's solution for the BT. 
+    /* An array for representing the user's solution for the BST. 
        array[solutionNodeIndex]:guessNodeIndex */
     private int[] gameBoard;
     
     /* An array for representing the game spaces' image states 
+       and piece availability
        array[nodeIndex + x]:imageState
-       x is 0 for BT spaces, x is 31 for game piece spaces */
+       x is 0 for BST spaces, x is 31 for game piece spaces */
     private boolean[] gameSpaces;
     
     /* A list containing the string labels of all the images used
@@ -102,6 +103,16 @@ public class BC_Model {
         return pieceSelected;
     }
     
+    public boolean isBoardSpotAvailable(int pieceIndex) {
+        
+        return !gameSpaces[pieceIndex];
+    }
+    
+    public boolean isGamePieceAvailable(int pieceIndex) {
+        
+        return gameSpaces[pieceIndex + 31];
+    }
+    
     public int getDifficulty() {
         
         return difficulty;
@@ -154,24 +165,25 @@ public class BC_Model {
     
     // ---------------- Mutators ----------------
     
-    public void setStartMode(boolean mode) {
-        startMode = mode;
+    public void setStartMode(boolean startMode) {
+        this.startMode = startMode;
     }
     
-    public void setGameMode(boolean mode) {
-        gameMode = mode;
+    public void setGameMode(boolean gameMode) {
+        this.gameMode = gameMode;
     }
     
-    public void setEndMode(boolean mode) {
-        endMode = mode;
+    public void setEndMode(boolean endMode) {
+        this.endMode = endMode;
     }
     
-    public void setGameOver(boolean mode) {
-        gameOver = mode;
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
     }
     
-    public void setPieceSelected(boolean selected) {
-        pieceSelected = selected;
+    public void setPieceSelected(boolean pieceSelected, BC_GameNode pieceSelectedNode) {
+        this.pieceSelected = pieceSelected;
+        this.pieceSelectedNode = pieceSelectedNode;
     }
     
     public void setDifficulty(int difficulty) {
@@ -180,10 +192,6 @@ public class BC_Model {
     
     public void setNumberOfNodes(int numberOfNodes) {
         this.numberOfNodes = numberOfNodes;
-    }
-    
-    public void setPieceSelectedNode(BC_GameNode pieceSelectedNode) {
-        this.pieceSelectedNode = pieceSelectedNode;
     }
     
     // ---------------- Methods ----------------
@@ -270,7 +278,24 @@ public class BC_Model {
         return result;
     }
     
-    protected void resetGameBoard(SimpleGUI gui) {
+    protected void insertGuess(int solutionNodeIndex, int guessNodeIndex) {
+        gameBoard[solutionNodeIndex] = guessNodeIndex;
+    }
+    
+    protected void moveUpdate(int boardIndex, int pieceIndex) {
+        guiLabelList.push("INS" + boardIndex);
+        gameSpaces[boardIndex] = true;
+        guiLabelList.push("CLR" + boardIndex);
+        gameSpaces[pieceIndex + 31] = false;
+    }
+    
+    protected void clearGameBoardSpot(int boardIndex) {
+        gameSpaces[boardIndex] = false;
+        gameSpaces[gameBoard[boardIndex] + 31] = true;
+        gameBoard[boardIndex] = -1;
+    }
+    
+    protected void resetGameBoard() {
         for(int i = 0; i < 31; i++) {
             gameBoard[i] = -1;
             gameSpaces[i] = false;
@@ -308,15 +333,7 @@ public class BC_Model {
     protected boolean checkForWin() {
         
         boolean won = true;
-        if(BC_BSTPuzzle.DEBUG)
-            System.out.println("Checking for win:");
-        
         for(BC_GameNode gameNode : originalNodeList) {
-            if(BC_BSTPuzzle.DEBUG)
-                System.out.println("gameBoard[" + gameNode.getNodeIndex() + "]: " + 
-                               gameBoard[gameNode.getNodeIndex()] + " | gameNode.getNodeIndex(): " + 
-                               gameNode.getNodeIndex());
-            
             if(gameBoard[gameNode.getNodeIndex()] != gameNode.getNodeIndex()) {
                 won = false;
                 break;
@@ -324,8 +341,6 @@ public class BC_Model {
         }
         
         if(won) {
-            if(BC_BSTPuzzle.DEBUG)
-                System.out.println("You Win!");
             gameMode = false;
             endMode = true;
         }

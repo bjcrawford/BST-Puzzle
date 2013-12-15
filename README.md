@@ -1,6 +1,6 @@
 Binary Search Tree Puzzle
 =========================
 
-A simple puzzle game using a binary search tree.
+A simple puzzle game written in java.
 
-![](https://raw.github.com/bjcrawford/PST_Puzzle/master/res/title.png)
+![](https://raw.github.com/bjcrawford/BST-Puzzle/master/res/title.png)

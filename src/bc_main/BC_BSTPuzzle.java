@@ -42,13 +42,13 @@ public class BC_BSTPuzzle {
         model.setGameMode(false);
         model.setEndMode(false);
         model.setGameOver(false);
-        model.setPieceSelected(false);
+        model.setPieceSelected(false, null);
     }
     
     private void mainGame() {
         gameInitialize();
         view.drawUI(model.getNumbersOfNodes(), model.getShuffledList(), model.getBSTGameBoard().getRoot());
-        model.resetGameBoard(view.getGui());
+        model.resetGameBoard();
         model.setGameMode(true);
     }
     

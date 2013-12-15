@@ -10,13 +10,12 @@ import simplegui.*;
  */
 public class BC_Controller implements SGMouseListener  {
     
-    static BC_Model model;
-    static BC_View view;
+    private BC_Model model;
+    private BC_View view;
     
     public BC_Controller(BC_Model model, BC_View view) {
         this.model = model;
         this.view = view;
-        view.getGui().registerToMouse(this);
     }
 
     @Override
@@ -54,7 +53,6 @@ public class BC_Controller implements SGMouseListener  {
         }
 
         view.clearStartScreen();
-        System.out.println("StartModeClick");
     }
     
     private void handleGameModeClick(int x, int y) {
@@ -65,6 +63,7 @@ public class BC_Controller implements SGMouseListener  {
             if(gameNode.getClass() == BC_BSTNode.class) { // Game board mouse click
 
                 if(model.isPieceSelected()) { // Input game piece
+                    
                     BC_GameNode selectedNode = model.getPieceSelected();
                     String guiLabelIns = "INS" + gameNode.getNodeIndex();
                     view.drawNode(selectedNode.getData(), gameNode.getScreenX(), gameNode.getScreenY(), guiLabelIns);
@@ -82,6 +81,7 @@ public class BC_Controller implements SGMouseListener  {
                     model.setPieceSelectedNode(null);
                     
                     if(BC_BSTPuzzle.DEBUG) {
+                        
                         System.out.println("input game piece");
                         System.out.println("BST: " + gameNode);
                         System.out.println("X: " + nodeX + " | Y: " + nodeY);
@@ -90,13 +90,16 @@ public class BC_Controller implements SGMouseListener  {
 
                 }
                 else { // Clear game board spot
+                    
                     if(model.getGameBoard()[gameNode.getNodeIndex()] != -1) {
+                        
                         view.clearMove("INS" + gameNode.getNodeIndex(), "CLR" + gameNode.getNodeIndex());
                         model.getGameSpaces()[model.getGameBoard()[gameNode.getNodeIndex()]] = false;
                         model.getGameSpaces()[model.getGameBoard()[gameNode.getNodeIndex()] + 31] = true;
                         model.getGameBoard()[gameNode.getNodeIndex()] = -1;
                         
                         if(BC_BSTPuzzle.DEBUG) {
+                            
                             System.out.println("filled node");
                             System.out.println("INS" + gameNode.getNodeIndex() + " | CLR" + gameNode.getNodeIndex());
                         }
@@ -106,19 +109,21 @@ public class BC_Controller implements SGMouseListener  {
             else { // Game piece mouse click
 
                 if(model.isPieceSelected()) { // Clear game piece selection
+                    
                     view.clearSelection();
                     model.setPieceSelected(false);
                     model.setPieceSelectedNode(null);
                 }
                 else { // Select game piece 
-                    if(BC_BSTPuzzle.DEBUG)
-                        System.out.println("gameSpaces[" + (gameNode.getNodeIndex() + 31) + "]: " + model.getGameSpaces()[gameNode.getNodeIndex() + 31]);
                     
                     if(model.getGameSpaces()[gameNode.getNodeIndex() + 31]) {
                         view.drawSelection(gameNode);
-                    model.setPieceSelected(true);
-                    model.setPieceSelectedNode(gameNode);
+                        model.setPieceSelected(true);
+                        model.setPieceSelectedNode(gameNode);
                     }
+                    
+                    if(BC_BSTPuzzle.DEBUG)
+                        System.out.println("gameSpaces[" + (gameNode.getNodeIndex() + 31) + "]: " + model.getGameSpaces()[gameNode.getNodeIndex() + 31]);
                 }
                 
                 if(BC_BSTPuzzle.DEBUG) {
@@ -127,6 +132,7 @@ public class BC_Controller implements SGMouseListener  {
             }
         }
         else { // Blank space mouse click
+            
             view.clearSelection();
             model.setPieceSelected(false);
             model.setPieceSelectedNode(null);

@@ -3,7 +3,6 @@ package bc_main;
 import bc_gamenode.BC_GameNode;
 import bc_binarysearchtree.*;
 import bc_listnode.BC_ListNode;
-import java.awt.Color;
 import java.util.LinkedList;
 import java.util.Random;
 import simplegui.*;
@@ -271,7 +270,7 @@ public class BC_Model {
         return result;
     }
     
-    public void resetGameBoard(SimpleGUI gui) {
+    protected void resetGameBoard(SimpleGUI gui) {
         for(int i = 0; i < 31; i++) {
             gameBoard[i] = -1;
             gameSpaces[i] = false;
@@ -279,7 +278,7 @@ public class BC_Model {
         }
     }
     
-    public BC_GameNode getNodeByScreenPos(int screenX, int screenY, int nodeSize) {
+    protected BC_GameNode getNodeByScreenPos(int screenX, int screenY, int nodeSize) {
         
         BC_GameNode foundNode = null;
         

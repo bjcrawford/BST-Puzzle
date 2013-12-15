@@ -9,18 +9,18 @@ import bc_gamenode.BC_GameNode;
  */
 public class BC_BSTPuzzle {
     
-    public static final boolean DEBUG = true;
+    protected static final boolean DEBUG = true;
         
-    BC_Model model;
-    BC_View view;
-    BC_Controller controller;
+    private BC_Model model;
+    private BC_View view;
+    private BC_Controller controller;
 
     private BC_BSTPuzzle() {
         
         model = new BC_Model();
         view = new BC_View(model);
         controller = new BC_Controller(model, view);
-        
+        view.getGui().registerToMouse(controller);
         launchGame();
     } 
     

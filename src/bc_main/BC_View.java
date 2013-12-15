@@ -14,14 +14,14 @@ import simplegui.*;
 public class BC_View {
     
     /* The width and height of the GUI window */
-    static final int WIDTH = 640;
-    static final int HEIGHT = 480;
+    private final int WIDTH = 640;
+    private final int HEIGHT = 480;
     
     /* The node size in pixels */
-    static final int NODESIZE = 24;;
+    private final int NODESIZE = 24;;
     
-    static BC_Model model;
-    private static SimpleGUI gui;
+    private BC_Model model;
+    private SimpleGUI gui;
     
     public BC_View(BC_Model model) {
         this.model = model;
@@ -45,7 +45,7 @@ public class BC_View {
         gui.drawImage("res/rules.png", 320, 220, 315, 240, "start");
     }
     
-    public void clearStartScreen() {
+    protected void clearStartScreen() {
         gui.eraseAllDrawables("start");
     }
     

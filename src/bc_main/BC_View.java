@@ -94,16 +94,13 @@ public class BC_View {
         }
     }
     
-    protected void drawNode(int data, int x, int y, String guiLabel) {
+    protected void drawNode(int data, int x, int y, int boardIndex) {
         String file = "" + (data <= 9 ? "0" : "") + data + ".png"; 
-        gui.drawImage("res/" + file, x, y, NODESIZE, NODESIZE, guiLabel);
+        gui.drawImage("res/" + file, x, y, NODESIZE, NODESIZE, "INS" + boardIndex);
     }
     
-    protected void drawBlankNode(int x, int y, String guiLabel) {
-        gui.drawImage("res/blank.png", x, y, NODESIZE, NODESIZE, guiLabel);
-        
-        // TODO: Make sure label is pushed to list in the model
-        //guiLabelList.push(guiLabel);
+    protected void drawBlankNode(int x, int y, int boardIndex) {
+        gui.drawImage("res/blank.png", x, y, NODESIZE, NODESIZE, "CLR" + boardIndex);
     }
     protected void drawSelection(BC_GameNode gameNode) {
         gui.drawFilledEllipse(gameNode.getScreenX(), gameNode.getScreenY(), NODESIZE, NODESIZE, Color.ORANGE, 0.5, "selection");

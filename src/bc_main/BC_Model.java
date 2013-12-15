@@ -260,7 +260,6 @@ public class BC_Model {
                 nodeIndex = bstNode.getNodeIndex();
                 data = bstNode.getData();
                 listNode = new BC_ListNode(nodeDepth, nodeIndex, data);
-                listNode.setIsImageOn(true);
                 shuffledNodeList.add(listNode);
                 arr[pos] = true;
             }

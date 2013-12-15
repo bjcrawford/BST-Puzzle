@@ -13,16 +13,14 @@ public abstract class BC_GameNode {
     private int data;
     private int screenX;
     private int screenY;
-    private boolean isImageOn;
-    private String imageNameOn;
-    private String imageNameOff = "blank.png";
+    private String imageName;
     
     public BC_GameNode(int nodeDepth, int nodeIndex, int data) {
         
         this.nodeDepth = nodeDepth;
         this.nodeIndex = nodeIndex;
         this.data = data;
-        imageNameOn = "" + (data <= 9 ? "0" : "") + data + ".png"; 
+        imageName = "" + (data <= 9 ? "0" : "") + data + ".png"; 
     }
     
     public int getNodeDepth() {
@@ -52,11 +50,7 @@ public abstract class BC_GameNode {
     
     public String getImageName() {
         
-        return isImageOn ? imageNameOn : imageNameOff;
-    }
-    
-    public void setIsImageOn(boolean isImageOn) {
-        this.isImageOn = isImageOn;
+        return imageName;
     }
     
     public void setScreenX(int screenX) {

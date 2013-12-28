@@ -5,7 +5,6 @@ import bc_binarysearchtree.*;
 import bc_listnode.BC_ListNode;
 import java.util.LinkedList;
 import java.util.Random;
-import simplegui.*;
 
 /**
  *

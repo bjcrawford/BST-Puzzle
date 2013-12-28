@@ -1,7 +1,5 @@
 package bc_gamenode;
 
-import bc_binarysearchtree.BC_BSTNode;
-
 /**
  *
  * @author Brett Crawford (Brett.Crawford@temple.edu)

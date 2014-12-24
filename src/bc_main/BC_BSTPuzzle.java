@@ -29,11 +29,22 @@ public class BC_BSTPuzzle {
         while(true) {
             initialize();
             view.drawStartScreen();
-            while(model.isStartMode()) {}
+            while(model.isStartMode())
+            	pause();
             mainGame();
             debugInfo();
-            while(!model.isGameOver()) {}
+            while(!model.isGameOver())
+            	pause();
         }
+    }
+    
+    private void pause() {
+    	try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     private void initialize() {

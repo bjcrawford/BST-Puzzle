@@ -62,7 +62,7 @@ public class BC_View {
         node.setScreenX(x - NODESIZE / 2);
         node.setScreenY(y);
         
-        gui.drawImage("res/" + node.getImageName(), x - NODESIZE / 2, y, NODESIZE, NODESIZE, "BST" + node.getNodeIndex());
+        gui.drawImage("res/blank.png", x - NODESIZE / 2, y, NODESIZE, NODESIZE, "BST" + node.getNodeIndex());
         
         if(node.getLeft() != null) {
             int leftX = x - childOffset;

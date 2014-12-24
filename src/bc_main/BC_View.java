@@ -26,6 +26,7 @@ public class BC_View {
     public BC_View(BC_Model model) {
         this.model = model;
         gui = new SimpleGUI(WIDTH, HEIGHT, false);
+        gui.setTitle("BST Puzzle");
     }
     
     public int getNodeSize() {
